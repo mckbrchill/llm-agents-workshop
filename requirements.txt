@@ -1,0 +1,16 @@
+loguru==0.7.3
+python-dotenv==1.1.0
+autogen-agentchat==0.5.3
+autogen-ext[openai,azure,semantic-kernel-mistralai]==0.5.3
+qdrant-client==1.13.3
+langchain==0.3.23
+langchain-qdrant==0.2.0
+langchain-text-splitters==0.3.8
+langchain-openai==0.3.14
+vt-py==0.20.0
+nest_asyncio==1.6.0
+
+opentelemetry-sdk==1.32.1
+opentelemetry-exporter-otlp==1.32.1
+openlit==1.33.19
+

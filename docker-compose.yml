@@ -1,0 +1,89 @@
+services:
+  n8n:
+    # image: docker.n8n.io/n8nio/n8n  # for original image
+    image: mckbrchill/n8n-custom:0.1.0 # for patched image
+    restart: always
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_PORT=5678
+      - GENERIC_TIMEZONE=${GENERIC_TIMEZONE}
+      - DB_TYPE=${DB_TYPE}
+      - DB_POSTGRESDB_DATABASE=${DB_POSTGRESDB_DATABASE}
+      - DB_POSTGRESDB_HOST=${DB_POSTGRESDB_HOST}
+      - DB_POSTGRESDB_PORT=${DB_POSTGRESDB_PORT}
+      - DB_POSTGRESDB_USER=${DB_POSTGRESDB_USER}
+      - DB_POSTGRESDB_PASSWORD=${DB_POSTGRESDB_PASSWORD}
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./local-files:/files
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: ${DB_POSTGRESDB_USER}
+      POSTGRES_PASSWORD: ${DB_POSTGRESDB_PASSWORD}
+      POSTGRES_DB: ${DB_POSTGRESDB_DATABASE}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5430:5432"
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data/pgdata
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    command: >
+      postgres -c max_connections=1000
+               -c shared_buffers=256MB
+               -c effective_cache_size=768MB
+               -c maintenance_work_mem=64MB
+               -c checkpoint_completion_target=0.7
+               -c wal_buffers=16MB
+               -c default_statistics_target=100
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres_user -d postgres_db" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    tty: true
+    stdin_open: true
+
+  qdrant:
+      image: qdrant/qdrant:v1.13.6
+      container_name: qdrant
+      ports:
+        - "6333:6333"
+        - "6334:6334"
+      configs:
+        - source: qdrant_config
+          target: /qdrant/config/production.yaml
+      volumes:
+        - ${QDRANT_DATA_DIR:-./qdrant_data}:/qdrant/storage
+      restart: unless-stopped
+      healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:6333/readiness"]
+        interval: 30s
+        timeout: 10s
+        retries: 3
+        start_period: 40s
+
+configs:
+  qdrant_config:
+    content: |
+      log_level: ${QDRANT_LOG_LEVEL:-INFO}
+      telemetry_disabled: true
+      service:
+        http_port: 6333
+        grpc_port: 6334
+
+volumes:
+  n8n_data:
+  pgdata:
+    driver: local

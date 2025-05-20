@@ -1,0 +1,160 @@
+{
+  "name": "Mitre Mapper",
+  "nodes": [
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolName": "mitre_attack_vector_store",
+        "toolDescription": "The mitre_attack_vector_store is a knowledge base trained on the MITRE ATT&CK framework. It is designed to help identify, correlate, and provide context for cybersecurity incidents based on textual descriptions of alerts, events, or behaviors. This tool leverages precomputed embeddings of attack techniques, tactics, and procedures (TTPs) to map user queries (such as SIEM-generated alerts or JIRA ticket titles) to relevant MITRE ATT&CK techniques.\n\nBy analyzing input text, the vector store can:\n\nRetrieve the most relevant MITRE ATT&CK entries (e.g., techniques, tactics, descriptions, external references).\nProvide structured context about potential adversary behaviors.\nSuggest remediation actions or detection methods based on the input.",
+        "qdrantCollection": {
+          "__rl": true,
+          "mode": "id",
+          "value": "mitre"
+        },
+        "options": {}
+      },
+      "id": "e3283e2d-3dc6-4e13-9b29-2a25b823e4ca",
+      "name": "Query Qdrant Vector Store1",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "position": [
+        320,
+        280
+      ],
+      "typeVersion": 1,
+      "credentials": {
+        "qdrantApi": {
+          "id": "liaOOe7IGTB32G38",
+          "name": "QdrantApi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a cybersecurity expert trained on MITRE ATT&CK and enterprise incident response. Your job is to:\n1. Map possible TTP information to SIEM normalized event.\n2. Provide actionable remediation steps tailored to the alert.\n3. Cross-reference historical patterns and related alerts.\n4. Recommend external resources for deeper understanding.\n\nEnsure that:\n- TTPs are tagged with the tactic, technique name, and technique ID.\n- Remediation steps are specific and actionable.\n- Historical data includes related alerts and notable trends.\n- External links are relevant to the observed behavior.\n\nSiem Normallized Event:\nEvent: {{ $json.toJsonString() }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": ""
+        }
+      },
+      "id": "9ead0edd-0a20-477d-ba51-a4a621c84893",
+      "name": "Mitre expert mapper",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        260,
+        0
+      ],
+      "typeVersion": 1.7
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "c452e24d-cf27-4701-8c26-148c39b4be4e",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "model": "mistral-large-latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "typeVersion": 1,
+      "position": [
+        120,
+        260
+      ],
+      "id": "324b81e3-6402-44d4-9a3b-80975bcc6eef",
+      "name": "Mistral Cloud Chat Model",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "2YEWptNkvZVTqSWc",
+          "name": "Mistral Cloud account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsMistralCloud",
+      "typeVersion": 1,
+      "position": [
+        320,
+        420
+      ],
+      "id": "f01c3341-ce4b-421d-9961-97a11df19b59",
+      "name": "Embeddings Mistral Cloud",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "2YEWptNkvZVTqSWc",
+          "name": "Mistral Cloud account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Query Qdrant Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Mitre expert mapper",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Mitre expert mapper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mistral Cloud Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Mitre expert mapper",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Mistral Cloud": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Query Qdrant Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e994b1b7-d857-4daf-8d1a-e7ef2f4ad302",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7eee7074382e1cb652f990d9057829ba14cead317bd96898c79c0463799cbeac"
+  },
+  "id": "B3FvSedD9MyCl57r",
+  "tags": []
+}

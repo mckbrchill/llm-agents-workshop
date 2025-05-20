@@ -1,0 +1,1257 @@
+{
+    "name": "Demo Siem Norm Events",
+    "nodes": [
+      {
+        "parameters": {
+          "options": {}
+        },
+        "id": "6d2f9a65-8cef-4fee-a080-d223a1e5193b",
+        "name": "When chat message received",
+        "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+        "position": [
+          700,
+          2060
+        ],
+        "webhookId": "a9668bb8-bbe8-418a-b5c9-ff7dd431244f",
+        "typeVersion": 1.1
+      },
+      {
+        "parameters": {
+          "options": {
+            "systemMessage": "You are a cybersecurity expert trained on MITRE ATT&CK and enterprise incident response. Your job is to:\n1. Extract TTP information from SIEM data.\n2. Provide actionable remediation steps tailored to the alert.\n3. Cross-reference historical patterns and related alerts.\n4. Recommend external resources for deeper understanding.\n\nEnsure that:\n- TTPs are tagged with the tactic, technique name, and technique ID.\n- Remediation steps are specific and actionable.\n- Historical data includes related alerts and notable trends.\n- External links are relevant to the observed behavior.\n"
+          }
+        },
+        "id": "a238543d-7a0e-4ecc-9bb8-58374e68c569",
+        "name": "AI Agent",
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "position": [
+          900,
+          2060
+        ],
+        "typeVersion": 1.7
+      },
+      {
+        "parameters": {
+          "fieldToSplitOut": "data",
+          "options": {
+            "destinationFieldName": ""
+          }
+        },
+        "id": "1c3e913a-0c47-4011-bdd6-e7e1479e55b7",
+        "name": "Split Out",
+        "type": "n8n-nodes-base.splitOut",
+        "position": [
+          820,
+          2920
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "jsonMode": "expressionData",
+          "jsonData": "={{ $json.description }}",
+          "options": {
+            "metadata": {
+              "metadataValues": [
+                {
+                  "name": "id",
+                  "value": "={{ $json.id }}"
+                },
+                {
+                  "name": "name",
+                  "value": "={{ $json.name }}"
+                },
+                {
+                  "name": "killchain",
+                  "value": "={{ $json.kill_chain_phases }}"
+                },
+                {
+                  "name": "external",
+                  "value": "={{ $json.external_references }}"
+                }
+              ]
+            }
+          }
+        },
+        "id": "80a3c7a8-a664-4fa1-8a5d-ae11d6c3f72a",
+        "name": "Default Data Loader",
+        "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+        "position": [
+          1440,
+          3160
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {},
+        "id": "7066603d-2e07-46d7-a9d4-42518b3d90a1",
+        "name": "Window Buffer Memory",
+        "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+        "position": [
+          980,
+          2340
+        ],
+        "typeVersion": 1.3
+      },
+      {
+        "parameters": {
+          "operation": "fromJson",
+          "options": {}
+        },
+        "id": "1bd78859-9339-44b0-a64f-e19efa8eb1cd",
+        "name": "Extract from File",
+        "type": "n8n-nodes-base.extractFromFile",
+        "position": [
+          640,
+          2920
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {},
+        "id": "6c8ca18e-d054-4c25-bb3f-e1b206d53d6f",
+        "name": "When clicking ‘Test workflow’",
+        "type": "n8n-nodes-base.manualTrigger",
+        "position": [
+          300,
+          1280
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "content": "![n8n](https://uploads.n8n.io/templates/qdrantlogo.png)\n## Embed your Vector Store\nTo provide data for your Vector store, you need to pass it in as JSON, and ensure it's setup correctly. This flow pulls the JSON file from Google Drive and extracts the JSON data and then passes it into the qdrant collection. ",
+          "height": 860,
+          "width": 1920,
+          "color": 7
+        },
+        "id": "e6b30d56-9386-4542-85bb-2b4b70b37d42",
+        "name": "Sticky Note",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          180,
+          2620
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "content": "![n8n](https://uploads.n8n.io/templates/n8n.png)\n## Talk to your Vector Store\nNow that your vector store has been updated with the embedded data, \nyou can use the n8n chat interface to talk to your data using OpenAI, \nOllama, or any of our supported LLMs.",
+          "height": 720,
+          "width": 1380,
+          "color": 7
+        },
+        "id": "630d7e7e-3ce2-43aa-9bbf-69fa046010a8",
+        "name": "Sticky Note1",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          180,
+          1900
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "content": "# Full workflow",
+          "height": 1260,
+          "width": 2960,
+          "color": 7
+        },
+        "id": "ec8dbfe2-5086-4910-8c44-599d0484117b",
+        "name": "Sticky Note2",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          180,
+          620
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "mode": "insert",
+          "qdrantCollection": {
+            "__rl": true,
+            "value": "mitre1",
+            "mode": "id"
+          },
+          "options": {}
+        },
+        "id": "1c35265e-8c81-4721-8831-8b3b03efc1b8",
+        "name": "Embed JSON in Qdrant Collection",
+        "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+        "position": [
+          1340,
+          2920
+        ],
+        "typeVersion": 1,
+        "credentials": {
+          "qdrantApi": {
+            "id": "liaOOe7IGTB32G38",
+            "name": "QdrantApi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "mode": "retrieve-as-tool",
+          "toolName": "mitre_attack_vector_store",
+          "toolDescription": "The mitre_attack_vector_store is a knowledge base trained on the MITRE ATT&CK framework. It is designed to help identify, correlate, and provide context for cybersecurity incidents based on textual descriptions of alerts, events, or behaviors. This tool leverages precomputed embeddings of attack techniques, tactics, and procedures (TTPs) to map user queries (such as SIEM-generated alerts or JIRA ticket titles) to relevant MITRE ATT&CK techniques.\n\nBy analyzing input text, the vector store can:\n\nRetrieve the most relevant MITRE ATT&CK entries (e.g., techniques, tactics, descriptions, external references).\nProvide structured context about potential adversary behaviors.\nSuggest remediation actions or detection methods based on the input.",
+          "qdrantCollection": {
+            "__rl": true,
+            "value": "mitre_demo",
+            "mode": "id"
+          },
+          "options": {}
+        },
+        "id": "7e1df28f-43fa-47a0-8ac4-86d401b65866",
+        "name": "Query Qdrant Vector Store",
+        "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+        "position": [
+          1160,
+          2260
+        ],
+        "typeVersion": 1,
+        "credentials": {
+          "qdrantApi": {
+            "id": "liaOOe7IGTB32G38",
+            "name": "QdrantApi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "fileSelector": "/files/cleaned_mitre_attack_data.json",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.readWriteFile",
+        "typeVersion": 1,
+        "position": [
+          420,
+          2920
+        ],
+        "id": "304f6162-ba18-436f-8466-a7bb716aafd3",
+        "name": "Read/Write Files from Disk",
+        "alwaysOutputData": true
+      },
+      {
+        "parameters": {
+          "chunkOverlap": 100,
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+        "typeVersion": 1,
+        "position": [
+          1440,
+          3340
+        ],
+        "id": "2da9a384-e95d-495c-8342-b91595395a57",
+        "name": "Recursive Character Text Splitter"
+      },
+      {
+        "parameters": {
+          "mode": "retrieve-as-tool",
+          "toolName": "mitre_attack_vector_store",
+          "toolDescription": "The mitre_attack_vector_store is a knowledge base trained on the MITRE ATT&CK framework. It is designed to help identify, correlate, and provide context for cybersecurity incidents based on textual descriptions of alerts, events, or behaviors. This tool leverages precomputed embeddings of attack techniques, tactics, and procedures (TTPs) to map user queries (such as SIEM-generated alerts or JIRA ticket titles) to relevant MITRE ATT&CK techniques.\n\nBy analyzing input text, the vector store can:\n\nRetrieve the most relevant MITRE ATT&CK entries (e.g., techniques, tactics, descriptions, external references).\nProvide structured context about potential adversary behaviors.\nSuggest remediation actions or detection methods based on the input.",
+          "qdrantCollection": {
+            "__rl": true,
+            "value": "mitre_demo",
+            "mode": "id"
+          },
+          "options": {}
+        },
+        "id": "cfb47903-2ba2-4935-9bc2-beeaeb7f5ef0",
+        "name": "Query Qdrant Vector Store1",
+        "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+        "position": [
+          1720,
+          1240
+        ],
+        "typeVersion": 1,
+        "credentials": {
+          "qdrantApi": {
+            "id": "liaOOe7IGTB32G38",
+            "name": "QdrantApi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "fileSelector": "/files/main_dump_short.json",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.readWriteFile",
+        "typeVersion": 1,
+        "position": [
+          520,
+          1280
+        ],
+        "id": "3cab14e3-5642-4981-9065-6df0481cc4f1",
+        "name": "Read/Write Files from Disk1",
+        "alwaysOutputData": true
+      },
+      {
+        "parameters": {
+          "operation": "fromJson",
+          "options": {}
+        },
+        "id": "077afc68-fea9-489f-9fa8-06324ab13dcc",
+        "name": "Extract from File1",
+        "type": "n8n-nodes-base.extractFromFile",
+        "position": [
+          700,
+          1280
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "maxItems": 2
+        },
+        "type": "n8n-nodes-base.limit",
+        "typeVersion": 1,
+        "position": [
+          1060,
+          1280
+        ],
+        "id": "42b25fd1-cc50-4439-bb81-f87bd5cabaf2",
+        "name": "Limit"
+      },
+      {
+        "parameters": {
+          "fieldToSplitOut": "data",
+          "options": {
+            "destinationFieldName": ""
+          }
+        },
+        "id": "c6b4c486-27f6-428d-bb3f-608d48c5b052",
+        "name": "Split Out1",
+        "type": "n8n-nodes-base.splitOut",
+        "position": [
+          880,
+          1280
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "mode": "combine",
+          "fieldsToMatchString": "output",
+          "joinMode": "keepEverything",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.1,
+        "position": [
+          2120,
+          1200
+        ],
+        "id": "147b4191-7108-4711-a403-ebb92af4a73d",
+        "name": "Merge"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=You are a cybersecurity expert.\nBelow I'll see a SIEM normallized event. If it's necessary, use the tools to enrich the information about the event and analyze the result\n\nSiem Normallized Event:\n{{ $json.toJsonString() }}",
+          "hasOutputParser": true,
+          "options": {}
+        },
+        "id": "14c94405-8c48-45bb-a17e-3ae6b8da9c1b",
+        "name": "VT Resolver",
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "position": [
+          1600,
+          1500
+        ],
+        "typeVersion": 1.7
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=You are a cybersecurity expert trained on MITRE ATT&CK and enterprise incident response. Your job is to:\n1. Map possible TTP information to SIEM normalized event.\n2. Provide actionable remediation steps tailored to the alert.\n3. Cross-reference historical patterns and related alerts.\n4. Recommend external resources for deeper understanding.\n\nEnsure that:\n- TTPs are tagged with the tactic, technique name, and technique ID.\n- Remediation steps are specific and actionable.\n- Historical data includes related alerts and notable trends.\n- External links are relevant to the observed behavior.\n\nSiem Normallized Event:\nEvent: {{ $json.toJsonString() }}",
+          "hasOutputParser": true,
+          "options": {
+            "systemMessage": ""
+          }
+        },
+        "id": "b259061e-7c0f-4e7a-8795-cb69d75677ec",
+        "name": "Mitre expert mapper",
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "position": [
+          1600,
+          1040
+        ],
+        "typeVersion": 1.7
+      },
+      {
+        "parameters": {
+          "chunkSize": 10000,
+          "options": {
+            "summarizationMethodAndPrompts": {
+              "values": {
+                "combineMapPrompt": "=Below there are detailed analysis for SIEM normallized event.\n\nWrite a brief but insightful summary for this dump:\n\"{text}\"\n\nCONCISE SUMMARY:",
+                "prompt": "Напиши краткий отчет на русском языке о результате анализа дампа процессов, суммаризируя информацию ниже\n\n\n\"{text}\"\n\n\nКраткий отчет:"
+              }
+            }
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.chainSummarization",
+        "typeVersion": 2,
+        "position": [
+          2760,
+          1200
+        ],
+        "id": "e6ab294b-6b16-4795-bd7a-5fde337b46ca",
+        "name": "Summarization Chain"
+      },
+      {
+        "parameters": {
+          "aggregate": "aggregateAllItemData",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.aggregate",
+        "typeVersion": 1,
+        "position": [
+          2280,
+          1200
+        ],
+        "id": "e70fabae-c694-4c63-9539-1c4ebc19d465",
+        "name": "Aggregate"
+      },
+      {
+        "parameters": {
+          "toolDescription": "Use this tool to get info about IP at Virus Total",
+          "url": "https://www.virustotal.com/api/v3/ip_addresses/{ip_address}",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "virusTotalApi",
+          "placeholderDefinitions": {
+            "values": [
+              {
+                "name": "ip_address",
+                "description": "Get info about IP address at VirusTotal",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+        "typeVersion": 1.1,
+        "position": [
+          1900,
+          1740
+        ],
+        "id": "af3751f9-d8d4-4dba-b961-330de3c499d2",
+        "name": "Virus Total IP Tool",
+        "credentials": {
+          "virusTotalApi": {
+            "id": "7T6LW6Txl5gn9c2A",
+            "name": "VirusTotal account 2"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "fileSelector": "/files/norm_events.json",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.readWriteFile",
+        "typeVersion": 1,
+        "position": [
+          580,
+          280
+        ],
+        "id": "f2e734b0-0fbc-4101-950e-722b1d19be6a",
+        "name": "Read/Write Files from Disk2",
+        "alwaysOutputData": true
+      },
+      {
+        "parameters": {
+          "operation": "fromJson",
+          "options": {}
+        },
+        "id": "a75b955a-57ff-4bc7-a29d-097e9a181b5e",
+        "name": "Extract from File2",
+        "type": "n8n-nodes-base.extractFromFile",
+        "position": [
+          760,
+          280
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "maxItems": 4,
+          "keep": "lastItems"
+        },
+        "type": "n8n-nodes-base.limit",
+        "typeVersion": 1,
+        "position": [
+          1120,
+          280
+        ],
+        "id": "2e41a6ad-726f-4f6a-8ad9-8f5345aaece8",
+        "name": "Limit1"
+      },
+      {
+        "parameters": {
+          "fieldToSplitOut": "data",
+          "options": {
+            "destinationFieldName": ""
+          }
+        },
+        "id": "cfdfff0b-fa67-4d29-b4e0-90f064860241",
+        "name": "Split Out2",
+        "type": "n8n-nodes-base.splitOut",
+        "position": [
+          940,
+          280
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "mode": "combine",
+          "fieldsToMatchString": "output",
+          "joinMode": "keepEverything",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.merge",
+        "typeVersion": 3.1,
+        "position": [
+          2180,
+          200
+        ],
+        "id": "f4e1baeb-1040-41bd-8e1c-b141e8beecd4",
+        "name": "Merge1"
+      },
+      {
+        "parameters": {
+          "chunkSize": 30000,
+          "options": {
+            "summarizationMethodAndPrompts": {
+              "values": {
+                "combineMapPrompt": "Below there are detailed analysis for SIEM normallized event.\nWrite a brief but insightful summary for this dump:\n\n\n\"{text}\"\n\n\nCONCISE SUMMARY:",
+                "prompt": "Напиши краткий отчет на русском языке о результате анализа дампа процессов, суммаризируя информацию ниже\n\n\n\"{text}\"\n\n\nКраткий отчет:"
+              }
+            }
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.chainSummarization",
+        "typeVersion": 2,
+        "position": [
+          2560,
+          200
+        ],
+        "id": "bfeb98cd-1f7d-4d3b-8684-5d3f6337fb0f",
+        "name": "Summarization Chain1"
+      },
+      {
+        "parameters": {
+          "aggregate": "aggregateAllItemData",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.aggregate",
+        "typeVersion": 1,
+        "position": [
+          2340,
+          200
+        ],
+        "id": "0280aef7-be00-4ea2-81cd-a0f2311a6d12",
+        "name": "Aggregate1"
+      },
+      {
+        "parameters": {
+          "content": "# Async",
+          "height": 680,
+          "width": 2900,
+          "color": 7
+        },
+        "id": "e6d001da-dd35-4d6e-9e5c-350f8598b0cd",
+        "name": "Sticky Note3",
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          180,
+          -80
+        ],
+        "typeVersion": 1
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "aB4LHQiM5H8hgrUP",
+            "mode": "list",
+            "cachedResultName": "Mitre Mapper"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "mode": "each",
+          "options": {
+            "waitForSubWorkflow": true
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.2,
+        "position": [
+          1640,
+          140
+        ],
+        "id": "0a5b31b1-4a91-4fa4-8094-fa9e929b2864",
+        "name": "Execute Workflow"
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "N4tFCztlu2nF1EeM",
+            "mode": "list",
+            "cachedResultName": "VT Resolver"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "mode": "each",
+          "options": {
+            "waitForSubWorkflow": true
+          }
+        },
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.2,
+        "position": [
+          1660,
+          400
+        ],
+        "id": "b04d5e21-4803-446f-b71b-9289b22b5ac9",
+        "name": "Execute Workflow1"
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.embeddingsMistralCloud",
+        "typeVersion": 1,
+        "position": [
+          1180,
+          3160
+        ],
+        "id": "07bdb081-b84c-4791-b102-43e59bea6e92",
+        "name": "Embeddings Mistral Cloud",
+        "credentials": {
+          "mistralCloudApi": {
+            "id": "2YEWptNkvZVTqSWc",
+            "name": "Mistral Cloud account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "keep": "lastItems"
+        },
+        "type": "n8n-nodes-base.limit",
+        "typeVersion": 1,
+        "position": [
+          1100,
+          2920
+        ],
+        "id": "fd098025-1ab9-43ea-8895-c1e6d5057033",
+        "name": "Limit2"
+      },
+      {
+        "parameters": {
+          "model": "mistral-large-latest",
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+        "typeVersion": 1,
+        "position": [
+          820,
+          2360
+        ],
+        "id": "5b13ff21-bc01-45a3-a961-4121fb80fe69",
+        "name": "Mistral Cloud Chat Model",
+        "credentials": {
+          "mistralCloudApi": {
+            "id": "2YEWptNkvZVTqSWc",
+            "name": "Mistral Cloud account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.embeddingsMistralCloud",
+        "typeVersion": 1,
+        "position": [
+          1300,
+          2440
+        ],
+        "id": "51a3b210-2034-4701-be3c-01338ca06c48",
+        "name": "Embeddings Mistral Cloud1",
+        "credentials": {
+          "mistralCloudApi": {
+            "id": "2YEWptNkvZVTqSWc",
+            "name": "Mistral Cloud account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "model": "mistral-large-latest",
+          "options": {
+            "maxRetries": 3
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+        "typeVersion": 1,
+        "position": [
+          1460,
+          1700
+        ],
+        "id": "bec8285e-69da-46f4-b555-3078934f2a15",
+        "name": "Mistral Cloud Chat Model1",
+        "credentials": {
+          "mistralCloudApi": {
+            "id": "2YEWptNkvZVTqSWc",
+            "name": "Mistral Cloud account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "model": "mistral-large-latest",
+          "options": {
+            "maxRetries": 3
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+        "typeVersion": 1,
+        "position": [
+          1480,
+          1260
+        ],
+        "id": "bbb09c14-2bf6-41fb-84d4-2b6c66041e30",
+        "name": "Mistral Cloud Chat Model2",
+        "credentials": {
+          "mistralCloudApi": {
+            "id": "2YEWptNkvZVTqSWc",
+            "name": "Mistral Cloud account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.embeddingsMistralCloud",
+        "typeVersion": 1,
+        "position": [
+          1660,
+          1360
+        ],
+        "id": "27276590-af73-43f6-bd9e-b374921cb1c8",
+        "name": "Embeddings Mistral Cloud2",
+        "credentials": {
+          "mistralCloudApi": {
+            "id": "2YEWptNkvZVTqSWc",
+            "name": "Mistral Cloud account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "model": "mistral-large-latest",
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+        "typeVersion": 1,
+        "position": [
+          2480,
+          400
+        ],
+        "id": "d69bc97e-68a4-4da9-8dbc-c99fb561a97d",
+        "name": "Mistral Cloud Chat Model3",
+        "credentials": {
+          "mistralCloudApi": {
+            "id": "2YEWptNkvZVTqSWc",
+            "name": "Mistral Cloud account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "model": "mistral-large-latest",
+          "options": {
+            "maxRetries": 3
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+        "typeVersion": 1,
+        "position": [
+          2680,
+          1420
+        ],
+        "id": "49ae7b63-b66d-475f-8e6a-7cd726231247",
+        "name": "Mistral Cloud Chat Model4",
+        "credentials": {
+          "mistralCloudApi": {
+            "id": "2YEWptNkvZVTqSWc",
+            "name": "Mistral Cloud account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "// Initialize an empty array to hold all output strings\nlet outputStrings = [];\n\n// Loop over all input items and collect their 'output' values\nfor (const item of $input.all()) {\n  // Check if item has data array\n  if (item.json.data && Array.isArray(item.json.data)) {\n    for (const dataItem of item.json.data) {\n      if (dataItem.output) {\n        // Handle both object and string output cases\n        if (typeof dataItem.output === 'object') {\n          // For object outputs, stringify them\n          outputStrings.push(JSON.stringify(dataItem.output, null, 2));\n        } else {\n          // For string outputs, use directly\n          outputStrings.push(dataItem.output.toString());\n        }\n      }\n    }\n  } else if (item.json.output) {\n    // Handle case where output is directly in item\n    if (typeof item.json.output === 'object') {\n      outputStrings.push(JSON.stringify(item.json.output, null, 2));\n    } else {\n      outputStrings.push(item.json.output.toString());\n    }\n  }\n}\n\n// Join all output strings with 4 newlines between them\nconst concatenatedOutput = outputStrings.join('\\n\\n\\n\\n');\n\n// Return a JSON object with the concatenated string\nreturn [{\n  json: {\n    combinedOutput: concatenatedOutput\n  }\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2540,
+          1200
+        ],
+        "id": "7e5b1ca9-d17c-48b6-86d0-e80a9e93c1a6",
+        "name": "Code"
+      }
+    ],
+    "pinData": {},
+    "connections": {
+      "Split Out": {
+        "main": [
+          [
+            {
+              "node": "Limit2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract from File": {
+        "main": [
+          [
+            {
+              "node": "Split Out",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Default Data Loader": {
+        "ai_document": [
+          [
+            {
+              "node": "Embed JSON in Qdrant Collection",
+              "type": "ai_document",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Window Buffer Memory": {
+        "ai_memory": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_memory",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Query Qdrant Vector Store": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When chat message received": {
+        "main": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When clicking ‘Test workflow’": {
+        "main": [
+          [
+            {
+              "node": "Read/Write Files from Disk1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Read/Write Files from Disk": {
+        "main": [
+          [
+            {
+              "node": "Extract from File",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Recursive Character Text Splitter": {
+        "ai_textSplitter": [
+          [
+            {
+              "node": "Default Data Loader",
+              "type": "ai_textSplitter",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Query Qdrant Vector Store1": {
+        "ai_tool": [
+          [
+            {
+              "node": "Mitre expert mapper",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Read/Write Files from Disk1": {
+        "main": [
+          [
+            {
+              "node": "Extract from File1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract from File1": {
+        "main": [
+          [
+            {
+              "node": "Split Out1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Limit": {
+        "main": [
+          [
+            {
+              "node": "Mitre expert mapper",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "VT Resolver",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Split Out1": {
+        "main": [
+          [
+            {
+              "node": "Limit",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge": {
+        "main": [
+          [
+            {
+              "node": "Aggregate",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "VT Resolver": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Mitre expert mapper": {
+        "main": [
+          [
+            {
+              "node": "Merge",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Aggregate": {
+        "main": [
+          [
+            {
+              "node": "Code",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Virus Total IP Tool": {
+        "ai_tool": [
+          [
+            {
+              "node": "VT Resolver",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Read/Write Files from Disk2": {
+        "main": [
+          [
+            {
+              "node": "Extract from File2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extract from File2": {
+        "main": [
+          [
+            {
+              "node": "Split Out2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Limit1": {
+        "main": [
+          [
+            {
+              "node": "Execute Workflow",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Execute Workflow1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Split Out2": {
+        "main": [
+          [
+            {
+              "node": "Limit1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Merge1": {
+        "main": [
+          [
+            {
+              "node": "Aggregate1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Aggregate1": {
+        "main": [
+          [
+            {
+              "node": "Summarization Chain1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Execute Workflow": {
+        "main": [
+          [
+            {
+              "node": "Merge1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Execute Workflow1": {
+        "main": [
+          [
+            {
+              "node": "Merge1",
+              "type": "main",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Embeddings Mistral Cloud": {
+        "ai_embedding": [
+          [
+            {
+              "node": "Embed JSON in Qdrant Collection",
+              "type": "ai_embedding",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Limit2": {
+        "main": [
+          [
+            {
+              "node": "Embed JSON in Qdrant Collection",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Mistral Cloud Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Embeddings Mistral Cloud1": {
+        "ai_embedding": [
+          [
+            {
+              "node": "Query Qdrant Vector Store",
+              "type": "ai_embedding",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Mistral Cloud Chat Model1": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "VT Resolver",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Mistral Cloud Chat Model2": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Mitre expert mapper",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Embeddings Mistral Cloud2": {
+        "ai_embedding": [
+          [
+            {
+              "node": "Query Qdrant Vector Store1",
+              "type": "ai_embedding",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Mistral Cloud Chat Model3": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Summarization Chain1",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Mistral Cloud Chat Model4": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Summarization Chain",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code": {
+        "main": [
+          [
+            {
+              "node": "Summarization Chain",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "active": false,
+    "settings": {
+      "executionOrder": "v1"
+    },
+    "versionId": "35402b89-0fe5-4d53-9585-d9a383b8416f",
+    "meta": {
+      "instanceId": "7eee7074382e1cb652f990d9057829ba14cead317bd96898c79c0463799cbeac"
+    },
+    "id": "ooBVIkSiexWZwSvn",
+    "tags": []
+  }

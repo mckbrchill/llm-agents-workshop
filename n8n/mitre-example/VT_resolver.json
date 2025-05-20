@@ -1,0 +1,130 @@
+{
+  "name": "VT Resolver",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a cybersecurity expert.\nBelow I'll see a SIEM normallized event. If it's necessary, use the tools to enrich the information about the event and analyze the result\n\nSiem Normallized Event:\n{{ $json.toJsonString() }}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "id": "3e6fe92f-2b31-43dc-9987-1ece9316dc8a",
+      "name": "VT Resolver",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1.7
+    },
+    {
+      "parameters": {
+        "toolDescription": "Use this tool to get info about IP at Virus Total",
+        "url": "https://www.virustotal.com/api/v3/ip_addresses/{ip_address}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "virusTotalApi",
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "ip_address",
+              "description": "Get info about IP address at VirusTotal",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        320,
+        240
+      ],
+      "id": "dab75e58-5970-4284-acff-3b9b4f7b66ce",
+      "name": "Virus Total IP Tool",
+      "credentials": {
+        "virusTotalApi": {
+          "id": "7T6LW6Txl5gn9c2A",
+          "name": "VirusTotal account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -300,
+        20
+      ],
+      "id": "ef3702b9-008b-4bb6-8080-2c24504ff490",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "model": "mistral-large-latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+      "typeVersion": 1,
+      "position": [
+        -120,
+        260
+      ],
+      "id": "ba19860c-a08a-47b3-bda7-8c5e6bf7dc83",
+      "name": "Mistral Cloud Chat Model",
+      "credentials": {
+        "mistralCloudApi": {
+          "id": "2YEWptNkvZVTqSWc",
+          "name": "Mistral Cloud account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Virus Total IP Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "VT Resolver",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "VT Resolver",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mistral Cloud Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "VT Resolver",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "",
+  "meta": {
+    "instanceId": "7eee7074382e1cb652f990d9057829ba14cead317bd96898c79c0463799cbeac"
+  },
+  "tags": []
+}
