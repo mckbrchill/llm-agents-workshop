@@ -73,7 +73,7 @@
 5. **Импортируйте и запустите существующие рабочие процессы**:
    - Нажмите "..." и выберите "Import from File"
    - Выберите файл рабочего процесса из `./n8n/mitre-example/norm_events_workflow.json` (или скопируйте и вставьте содержимое JSON напрямую)
-   - Настройте учетные данные во всех блоках
+   - Настройте учетные данные во всех блоках - [Mistral Platform](https://admin.mistral.ai/plateforme/limits) и [VirusTotal](https://www.virustotal.com)
    - Нажмите "Test Workflow" для запуска
 
 ### (Вариант 2) Использование реализации в Jupyter Notebook

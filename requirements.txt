@@ -7,6 +7,7 @@ langchain==0.3.23
 langchain-qdrant==0.2.0
 langchain-text-splitters==0.3.8
 langchain-openai==0.3.14
+langchain-mistralai==0.2.10
 vt-py==0.20.0
 nest_asyncio==1.6.0
 
