@@ -11,7 +11,4 @@ notebooks/.ipynb_checkpoints
 
 reports/*
 
-n8n/mitre-example/full_solution_flow.json
 n8n/mitre-example/siem_norm_events_workflow_base.json
-notebooks/siem_events_workflow_solution.ipynb
-n8n/mitre-example/cmdline_analyzer.json

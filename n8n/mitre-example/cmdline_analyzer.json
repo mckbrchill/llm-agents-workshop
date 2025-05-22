@@ -1,0 +1,113 @@
+{
+    "nodes": [
+      {
+        "parameters": {
+          "model": "mistral-large-latest",
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatMistralCloud",
+        "typeVersion": 1,
+        "position": [
+          1320,
+          780
+        ],
+        "id": "bd77579f-1f7c-4b99-af1e-607d368a4995",
+        "name": "Mistral Cloud Chat Model5",
+        "credentials": {
+          "mistralCloudApi": {
+            "id": "2YEWptNkvZVTqSWc",
+            "name": "Mistral Cloud account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "toolDescription": "Use this tool is used to make a web search via Tavily search engine.",
+          "method": "POST",
+          "url": "https://api.tavily.com/search",
+          "authentication": "predefinedCredentialType",
+          "nodeCredentialType": "tavilyApi",
+          "sendBody": true,
+          "parametersBody": {
+            "values": [
+              {
+                "name": "query"
+              }
+            ]
+          },
+          "placeholderDefinitions": {
+            "values": [
+              {
+                "name": "query",
+                "description": "Query for web search",
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+        "typeVersion": 1.1,
+        "position": [
+          1640,
+          820
+        ],
+        "id": "66b831ea-b0c5-4d78-a326-89b4bd3b1d67",
+        "name": "Tavily Search Tool",
+        "credentials": {
+          "virusTotalApi": {
+            "id": "7T6LW6Txl5gn9c2A",
+            "name": "VirusTotal account 2"
+          },
+          "tavilyApi": {
+            "id": "ohn8Sar7FHiwgH8J",
+            "name": "Tavily account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=You are a cybersecurity expert.\nBelow you'll see a command line. Always use the tools to enrich the information about process name and anaylze the commandline.\n\nCommandline:\n{{ $json['object.process.cmdline'] }}",
+          "hasOutputParser": true,
+          "options": {}
+        },
+        "id": "8edb960a-9d3f-4c2b-8a72-294cc45a8860",
+        "name": "CmdLine Explainer",
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "position": [
+          1360,
+          580
+        ],
+        "typeVersion": 1.7
+      }
+    ],
+    "connections": {
+      "Mistral Cloud Chat Model5": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "CmdLine Explainer",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Tavily Search Tool": {
+        "ai_tool": [
+          [
+            {
+              "node": "CmdLine Explainer",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "pinData": {},
+    "meta": {
+      "templateCredsSetupCompleted": true,
+      "instanceId": "7eee7074382e1cb652f990d9057829ba14cead317bd96898c79c0463799cbeac"
+    }
+  }

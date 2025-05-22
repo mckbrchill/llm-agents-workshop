@@ -19,3 +19,16 @@
     }
 }
 ```
+
+
+# Решение
+
+n8n
+```
+n8n\mitre-example\full_solution_flow.json
+```
+
+code
+```
+notebooks\siem_events_workflow_solution.ipynb
+````
